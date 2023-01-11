@@ -1,53 +1,64 @@
+import { Due, Task as ModelTask }from '../../model/task'
 
 
-function HeadingName() {
+function HeadingName({ name }: { name: string }) {
     return (<span className='
         w-1/3
         font-inherit
     '>
-        "Do Laundry"
+        "{name}"
     </span>)
 }
 
-function HeadingPriority() {
+function HeadingPriority({ priority }: { priority: number }) {
     return (<span className='
-        w-1/4
+        sm:w-1/4 w-1/5
         font-inherit
     '>
-        <b className='hidden sm:inline'>Priority:</b> x
+        <b className='hidden sm:inline'>Priority:</b> { priority }
     </span>)
 }
 
-function HeadingDate() {
+function HeadingDate({ due }: { due: Due }) {
     return (<span className='
-        sm:w-1/3 w-10 pb-1
+        sm:w-1/3 w-25 pb-1
         font-inherit
     '>
         <b className='hidden lg:inline'>Due: </b> 
-        x<b className='hidden lg:inline'> days, </b><b className='lg:hidden sm:inline hidden'> d </b><b className='inline sm:hidden'>:</b>
-        y<b className='hidden lg:inline'> hours, </b><b className='lg:hidden sm:inline hidden'> hr </b><b className='inline sm:hidden'>:</b>
-        z<b className='hidden lg:inline'> minutes </b><b className='lg:hidden sm:inline hidden'> min </b><b className='inline sm:hidden'></b>
+        { due.days }<b className='hidden lg:inline'> days, </b><b className='lg:hidden sm:inline hidden'> d </b><b className='inline sm:hidden'>d </b>
+        { due.hours }<b className='hidden lg:inline'> hours, </b><b className='lg:hidden sm:inline hidden'> hr </b><b className='inline sm:hidden'>h </b>
+        {/* { due.minutes }<b className='hidden lg:inline'> minutes </b><b className='lg:hidden sm:inline hidden'> min </b><b className='inline sm:hidden'>m </b> */}
     </span>)
 }
 
-function Heading(){
+interface HeadingProps {
+    name: string,
+    priority: number,
+    due: Due,
+}
+
+function Heading({ name, priority, due }: HeadingProps){
+    console.log(name, priority, due);
+
     return (<div className='
         w-full p-3
         flex flex-wrap justify-center
         font-inherit
     '>
-        <HeadingName />
-        <HeadingPriority />
-        <HeadingDate />
+        <HeadingName name={ name }/>
+        <HeadingPriority priority={ priority }/>
+        <HeadingDate due={ due }/>
     </div>);
 }
 
-function Description() {
+function Description({text}: { text: string}) {
+    console.log(text);
+
     return (
         <div className='flex justify-center items-center p-3'>
             <div className='
                 hidden
-                lg:grid h-32 items-center
+                lg:grid items-center
                 px-2
             '>
                 <p className='
@@ -58,13 +69,10 @@ function Description() {
             </div>
             <div className='
                 w-4/5  grid items-center
-                px-2
+                px-2 py-4
             '>
                 <p className='font-inherit'>
-                    Sed a ipsum egestas, scelerisque quam at, faucibus neque. 
-                    Ut a egestas arcu. Praesent vitae fringilla 
-                    nulla. Etiam quis posuere nisi. Phasellus interdum quam velit, nec 
-                    luctus metus malesuada et.
+                    { text }
                 </p>
                 
             </div>
@@ -74,17 +82,24 @@ function Description() {
     );
 }
 
+interface CardProps{
+    task: ModelTask
+}
 
-function Card(){
+
+
+function Card({ task }: CardProps){
+    console.log(task);
+
     return (
         <div className='
-            py-4
+            py-4 w-full
             rounded-3xl
             border border-white
             font-mono
         '>
-            <Heading />
-            <Description />
+            <Heading name={ task.name } priority={ task.priority } due={ task.getDue() }/>
+            <Description text={ task.description }/>
         </div>
     )
 }
@@ -93,15 +108,16 @@ function Card(){
 interface ChildProps {
     // myFunction: React.MutableRefObject<() => void>; // React MutableRefObject
     handleClick: () => void;
+    task: ModelTask;
 }
 
-export default function Task({ handleClick }: ChildProps) {
+export default function Task({ handleClick, task }: ChildProps) {
 
     return (
         <div className='
             flex justify-center items-center p-2
         '>
-            <Card />
+            <Card task={ task }/>
             <button className='
                 ml-4 mr-2 lg:ml-8 lg:mr-4
                 border-white border rounded-2xl

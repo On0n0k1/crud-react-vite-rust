@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import Task  from './view/components/task'
-import Model from './model/task'
+import { Task as TaskData } from './model/task'
 import './App.css'
 
 function Include() {
@@ -24,11 +24,41 @@ function Include() {
 }
 
 function TaskList() {
-    const [tasks, setTasks] = useState([1,2,3,4]);
+    const [tasks, setTasks] = useState([
+        new TaskData(
+            "name",
+            3,
+            new Date('jul 21 2024'),
+            "A description",
+            31
+        ),
+        new TaskData(
+            "name",
+            3,
+            new Date('jul 21 2024'),
+            "A description",
+            41
+        ),
+        new TaskData(
+            "name",
+            3,
+            new Date('jul 21 2024'),
+            "A description",
+            55
+        ),
+        new TaskData(
+            "name",
+            3,
+            new Date('jul 21 2024'),
+            "A description",
+            72
+        ),
+        
+    ]);
 
     return <div>
         {
-            tasks.map((value) => <Task key={value} handleClick={() => console.log("Clicked ", value)} />)
+            tasks.map((value) => <Task key={value.id} task={ value } handleClick={() => console.log("Clicked ", value)} />)
         }
         <Include />
     </div>    

@@ -21,7 +21,7 @@ export class Due{
 }
 
 
-export default class Task {
+export class Task {
     name: string;
     priority: number;
     due: Date;
