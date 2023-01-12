@@ -10,7 +10,6 @@ export function Description({text}: { text: string}) {
                 px-2
             '>
                 <p className='
-                    
                     text-2xl font-inherit
                     pl-4
                 '><b>Description:</b></p>

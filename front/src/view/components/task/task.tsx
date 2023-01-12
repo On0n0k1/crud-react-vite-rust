@@ -1,4 +1,4 @@
-import { Task as ModelTask } from '../../model/task'
+import { Task as ModelTask } from '../../../model/task'
 
 import Card from './card';
 

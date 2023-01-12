@@ -1,7 +1,21 @@
-import { Task as ModelTask } from '../../model/task';
+import { Task as ModelTask } from '../../../model/task';
 import { Description } from './description';
 import { Heading } from './heading';
 
+
+export function EditButton() {
+    return (<div className='
+        w-full p-2
+        grid items-center
+    '>
+        <button className='
+            p-4 hover:bg-gray-700
+            rounded-xl border-white
+        '>
+            Edit
+        </button>
+    </div>);
+}
 
 export interface CardProps{
     task: ModelTask
@@ -19,6 +33,7 @@ export default function Card({ task }: CardProps){
         '>
             <Heading name={ task.name } priority={ task.priority } due={ task.getDue() }/>
             <Description text={ task.description }/>
+            <EditButton />
         </div>
     )
 }

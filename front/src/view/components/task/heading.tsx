@@ -1,4 +1,4 @@
-import { Due } from '../../model/task';
+import { Due } from '../../../model/task';
 
 
 export function HeadingName({ name }: { name: string }) {
