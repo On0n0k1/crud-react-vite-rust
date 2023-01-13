@@ -2,8 +2,16 @@ import { Task as ModelTask } from '../../../model/task';
 import { Description } from './description';
 import { Heading } from './heading';
 
+import { useState } from 'react';
 
-export function EditButton() {
+interface EditButtonProps{
+    toggleEditMode: () => void,
+    editMode: boolean,
+}
+
+export function EditButton({ toggleEditMode, editMode }: EditButtonProps) {
+    const text = editMode ? "Save" : "Edit";
+
     return (<div className='
         w-full p-2
         grid items-center
@@ -11,8 +19,8 @@ export function EditButton() {
         <button className='
             p-4 hover:bg-gray-700
             rounded-xl border-white
-        '>
-            Edit
+        ' onClick={ toggleEditMode }>
+            { text }
         </button>
     </div>);
 }
@@ -22,6 +30,10 @@ export interface CardProps{
 }
 
 export default function Card({ task }: CardProps){
+
+    const [editMode, setEditMode] = useState(false);
+    const toggleEditMode = () => setEditMode(!editMode);
+
     console.log(task);
 
     return (
@@ -31,9 +43,9 @@ export default function Card({ task }: CardProps){
             border border-white
             font-mono
         '>
-            <Heading task={ task }/>
-            <Description task={ task }/>
-            <EditButton />
+            <Heading task={ task } editMode={ editMode }/>
+            <Description task={ task } editMode={ editMode }/>
+            <EditButton toggleEditMode={ toggleEditMode } editMode={ editMode }/>
         </div>
     )
 }
