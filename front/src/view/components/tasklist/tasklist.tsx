@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 import Task  from '../task/task'
-import { Task as TaskData } from '../../../model/task'
+import { Task as ModelTask } from '../../../model/task'
 
 function Include() {
     const action = () => console.log("+ clicked");
@@ -23,29 +23,29 @@ function Include() {
 }
 
 export default function TaskList() {
-    const [tasks, setTasks] = useState([
-        new TaskData(
+    const tasklist = [
+        new ModelTask(
             "name",
             3,
             new Date('jul 21 2024'),
             "A description",
             31
         ),
-        new TaskData(
+        new ModelTask(
             "name",
             3,
             new Date('jul 21 2024'),
             "A description",
             41
         ),
-        new TaskData(
+        new ModelTask(
             "name",
             3,
             new Date('jul 21 2024'),
             "A description",
             55
         ),
-        new TaskData(
+        new ModelTask(
             "name",
             3,
             new Date('jul 21 2024'),
@@ -53,11 +53,19 @@ export default function TaskList() {
             72
         ),
         
-    ]);
+    ];
+
+    const tasks: React.MutableRefObject<ModelTask>[] = new Array();
+
+    tasklist.forEach((item, index) => {
+        tasks.push(useRef(item));
+    })
+
+
 
     return <div>
         {
-            tasks.map((value) => <Task key={value.id} task={ value } handleClick={() => console.log("Clicked ", value)} />)
+            tasks.map((value) => <Task key={value.current.id} task={ value } handleClick={() => console.log("Clicked ", value)} />)
         }
         <Include />
     </div>    

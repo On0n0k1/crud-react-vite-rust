@@ -27,6 +27,7 @@ export class Task {
     due: Date;
     description: string;
     id: number;
+    updated: boolean;
 
     constructor(
         name: string, 
@@ -40,6 +41,7 @@ export class Task {
         this.due = due;
         this.description = description;
         this.id = id;
+        this.updated = false;
     }
 
     getDue(): Due {
