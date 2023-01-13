@@ -48,7 +48,7 @@ export default function TaskList() {
         new ModelTask(
             "name",
             3,
-            new Date('jul 21 2024'),
+            new Date('jan 14 2023'),
             "A description",
             72
         ),

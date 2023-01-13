@@ -1,6 +1,12 @@
+import { Task as ModelTask } from '../../../model/task'
 
-export function Description({text}: { text: string}) {
-    console.log(text);
+interface DescriptionProps{
+    task: React.MutableRefObject<ModelTask>
+}
+
+// export function Description({text}: { text: string}) {
+export function Description({ task }: DescriptionProps) {
+    console.log(task.current.description);
 
     return (
         <div className='flex justify-center items-center p-3'>
@@ -19,7 +25,7 @@ export function Description({text}: { text: string}) {
                 px-2 py-4
             '>
                 <p className='font-inherit'>
-                    { text }
+                    { task.current.description }
                 </p>
                 
             </div>

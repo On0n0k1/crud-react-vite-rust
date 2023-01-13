@@ -18,7 +18,7 @@ export function EditButton() {
 }
 
 export interface CardProps{
-    task: ModelTask
+    task: React.MutableRefObject<ModelTask>
 }
 
 export default function Card({ task }: CardProps){
@@ -31,8 +31,8 @@ export default function Card({ task }: CardProps){
             border border-white
             font-mono
         '>
-            <Heading name={ task.name } priority={ task.priority } due={ task.getDue() }/>
-            <Description text={ task.description }/>
+            <Heading task={ task }/>
+            <Description task={ task }/>
             <EditButton />
         </div>
     )
