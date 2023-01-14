@@ -1,6 +1,8 @@
 import { Due, Task as ModelTask } from '../../../model/task';
 
 import { useState, useEffect } from 'react';
+import Calendar from './calendar';
+
 
 interface HeadingProps{
     task: React.MutableRefObject<ModelTask>
@@ -75,20 +77,53 @@ export function HeadingPriority({ task, editMode }: HeadingProps) {
     </span>)
 }
 
-export function HeadingDate({ task }: HeadingProps) {
+export function HeadingDate({ task, editMode }: HeadingProps) {
+    if (editMode) { 
+        return (
+            <div className='w-auto h-auto'>
+                <Calendar task={ task }/>
+            </div>
+        )
+    }
+
     let due = task.current.getDue();
 
+    let components = [
+        (<>{ due.years }<b className='hidden lg:inline'> years, </b><b className='sm:inline lg:hidden'> yr </b></>),
+        (<>{ due.months }<b className='hidden lg:inline'> months, </b><b className='sm:inline lg:hidden'> mon </b></>),
+        (<>{ due.days }<b className='inline'> days </b></>),
+        (<>{ due.hours }<b className='hidden lg:inline'> hours, </b><b className='sm:inline lg:hidden'> hr </b></>),
+        (<>{ due.minutes }<b className='hidden lg:inline'> minutes </b><b className='sm:inline lg:hidden'> min </b></>),
+        (<>{ due.seconds }<b className='hidden lg:inline'> seconds </b><b className='sm:inline lg:hidden'> sec </b></>),
+    ];
+
+    let attributes = [
+        due.years,
+        due.months,
+        due.days,
+        due.hours,
+        due.minutes,
+        due.seconds,
+    ];
+
+    let renderedComponents = [];
+
+    for (let step = 0; step < components.length; step++){
+        if(renderedComponents.length>1){
+            break;
+        }
+
+        if (attributes[step] != 0){
+            renderedComponents.push(components[step]);
+        }
+    }
+    
     return (<span className='
         sm:w-1/3 w-25 pb-1
         font-inherit
     '>
         <b className='hidden lg:inline'>Due: </b> 
-        { due.years }<b className='hidden lg:inline'> years, </b><b className='lg:hidden sm:inline hidden'> y </b><b className='inline sm:hidden'>y </b>
-        { due.months }<b className='hidden lg:inline'> months, </b><b className='lg:hidden sm:inline hidden'> m </b><b className='inline sm:hidden'>m </b>
-        { due.days }<b className='hidden lg:inline'> days, </b><b className='lg:hidden sm:inline hidden'> d </b><b className='inline sm:hidden'>d </b>
-        { due.hours }<b className='hidden lg:inline'> hours, </b><b className='lg:hidden sm:inline hidden'> hr </b><b className='inline sm:hidden'>h </b>
-        { due.minutes }<b className='hidden lg:inline'> minutes </b><b className='lg:hidden sm:inline hidden'> min </b><b className='inline sm:hidden'>m </b>
-        { due.seconds }<b className='hidden lg:inline'> seconds </b><b className='lg:hidden sm:inline hidden'> sec </b><b className='inline sm:hidden'>s </b>
+        { renderedComponents }
         
     </span>)
 }
