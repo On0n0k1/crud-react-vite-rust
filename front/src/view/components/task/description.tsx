@@ -20,7 +20,10 @@ export function Description({ task, editMode }: DescriptionProps) {
     
     if (editMode) {
         return (
-            <div className='flex justify-center items-center p-3'>
+            <div className='
+                flex justify-center items-center p-3
+                col-span-2
+            '>
                 <div className='
                     hidden
                     lg:grid items-center
@@ -49,7 +52,10 @@ export function Description({ task, editMode }: DescriptionProps) {
     }
 
     return (
-        <div className='flex justify-center items-center p-3'>
+        <div className='
+            flex justify-center items-center p-3
+            col-span-2
+        '>
             <div className='
                 hidden
                 lg:grid items-center

@@ -27,28 +27,28 @@ export default function TaskList() {
         new ModelTask(
             "name",
             3,
-            new Date('jul 21 2024'),
+            new Date('jan 21 2023'),
             "A description",
             31
         ),
         new ModelTask(
             "name",
-            3,
-            new Date('jul 21 2024'),
+            1,
+            new Date('feb 18 2023'),
             "A description",
             41
         ),
         new ModelTask(
             "name",
-            3,
+            6,
             new Date('jul 21 2024'),
             "A description",
             55
         ),
         new ModelTask(
             "name",
-            3,
-            new Date('jan 14 2023'),
+            5,
+            new Date('jan 30 2023'),
             "A description",
             72
         ),

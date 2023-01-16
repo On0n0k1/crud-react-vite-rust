@@ -1,36 +1,19 @@
 import { Task as ModelTask } from '../../../model/task';
 import { Description } from './description';
-import { Heading } from './heading';
+
+import Name from './name';
+import Due from './due';
+import Priority from './priority';
+import Edit from './edit';
 
 import { useState } from 'react';
 
-interface EditButtonProps{
-    toggleEditMode: () => void,
-    editMode: boolean,
-}
-
-export function EditButton({ toggleEditMode, editMode }: EditButtonProps) {
-    const text = editMode ? "Save" : "Edit";
-
-    return (<div className='
-        w-full p-2
-        grid items-center
-    '>
-        <button className='
-            p-4 hover:bg-gray-700
-            rounded-xl border-white
-        ' onClick={ toggleEditMode }>
-            { text }
-        </button>
-    </div>);
-}
 
 export interface CardProps{
     task: React.MutableRefObject<ModelTask>
 }
 
 export default function Card({ task }: CardProps){
-
     const [editMode, setEditMode] = useState(false);
     const toggleEditMode = () => setEditMode(!editMode);
 
@@ -42,10 +25,13 @@ export default function Card({ task }: CardProps){
             rounded-3xl
             border border-white
             font-mono
+            grid grid-cols-2 gap-2
         '>
-            <Heading task={ task } editMode={ editMode }/>
+            <Name task= { task } editMode={ editMode }/>
+            <Due task= { task } editMode={ editMode }/>
+            <Priority task= { task } editMode={ editMode }/>
             <Description task={ task } editMode={ editMode }/>
-            <EditButton toggleEditMode={ toggleEditMode } editMode={ editMode }/>
+            <Edit toggleEditMode={ toggleEditMode } editMode={ editMode }/>
         </div>
     )
 }
