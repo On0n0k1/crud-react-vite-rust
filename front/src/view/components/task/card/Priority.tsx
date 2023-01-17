@@ -1,13 +1,13 @@
-import { Task as ModelTask } from '../../../model/task';
+import { Task as ModelTask } from '../../../../model/model';
 
 import { useState, useEffect } from 'react';
 
-export interface HeadingPriorityProps{
+export interface PriorityProps{
     task: React.MutableRefObject<ModelTask>
     editMode: boolean,
 }
 
-export default function HeadingPriority({ task, editMode }: HeadingPriorityProps) {
+export function Priority({ task, editMode }: PriorityProps) {
     const [priority, setPriority] = useState(task.current.priority);
 
     useEffect(() => {
@@ -52,3 +52,5 @@ export default function HeadingPriority({ task, editMode }: HeadingPriorityProps
         '>Priority:</b> { task.current.priority }
     </span>)
 }
+
+export default Priority;

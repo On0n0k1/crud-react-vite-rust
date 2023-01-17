@@ -1,9 +1,9 @@
-interface EditButtonProps{
+interface EditProps{
     toggleEditMode: () => void,
     editMode: boolean,
 }
 
-export default function EditButton({ toggleEditMode, editMode }: EditButtonProps) {
+export function Edit({ toggleEditMode, editMode }: EditProps) {
     const text = editMode ? "Save" : "Edit";
 
     return (<div className='
@@ -18,3 +18,5 @@ export default function EditButton({ toggleEditMode, editMode }: EditButtonProps
         </button>
     </div>);
 }
+
+export default Edit;

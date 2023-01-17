@@ -1,10 +1,10 @@
-import { Task as ModelTask } from '../../../model/task';
-import { Description } from './description';
+import { Task as ModelTask } from '../../../../model/model';
+import { Description } from './Description';
 
-import Name from './name';
-import Due from './due';
-import Priority from './priority';
-import Edit from './edit';
+import Name from './Name';
+import Due from './Due';
+import Priority from './Priority';
+import Edit from './Edit';
 
 import { useState } from 'react';
 
@@ -13,7 +13,7 @@ export interface CardProps{
     task: React.MutableRefObject<ModelTask>
 }
 
-export default function Card({ task }: CardProps){
+export function Card({ task }: CardProps){
     const [editMode, setEditMode] = useState(false);
     const toggleEditMode = () => setEditMode(!editMode);
 
@@ -35,3 +35,5 @@ export default function Card({ task }: CardProps){
         </div>
     )
 }
+
+export default Card;

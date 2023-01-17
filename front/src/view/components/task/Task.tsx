@@ -1,13 +1,12 @@
-import { Task as ModelTask } from '../../../model/task'
-
-import Card from './card';
+import { Task as ModelTask } from '../../../model/Task';
+import { Card } from './card/Card';
 
 interface ChildProps {
-    handleClick: () => void;
+    handleRemove: () => void;
     task: React.MutableRefObject<ModelTask>;
 }
 
-export default function Task({ handleClick, task }: ChildProps) {
+export function Task({ handleRemove, task }: ChildProps) {
 
     return (
         <div className='
@@ -18,7 +17,7 @@ export default function Task({ handleClick, task }: ChildProps) {
                 ml-4 mr-2 lg:ml-8 lg:mr-4
                 border-white border rounded-2xl
                 hover:bg-gray-700
-            ' onClick={ handleClick }>
+            ' onClick={ handleRemove }>
                 <p className='
                     p-2 px-4 font-mono font-bold
                 '>x</p>
@@ -27,3 +26,4 @@ export default function Task({ handleClick, task }: ChildProps) {
     )
 }
 
+export default Task;

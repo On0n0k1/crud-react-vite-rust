@@ -1,6 +1,6 @@
-import { Due, Task as ModelTask } from '../../../model/task';
+import { Task as ModelTask, Due as ModelDue} from '../../../../model/model';
 
-import Calendar from './calendar';
+import Schedule from './schedule/Schedule';
 
 import { useRef } from 'react';
 
@@ -10,7 +10,7 @@ export interface HeadingDueProps{
     editMode: boolean,
 }
 
-function Years({ due, counter }: { due: Due, counter: React.MutableRefObject<number> }){
+function Years({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<number> }){
     if (counter.current>1){
         counter.current= counter.current + 1;
         return (<></>);
@@ -21,7 +21,7 @@ function Years({ due, counter }: { due: Due, counter: React.MutableRefObject<num
     )
 }
 
-function Months({ due, counter }: { due: Due, counter: React.MutableRefObject<number> }){
+function Months({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<number> }){
     if (counter.current>1){
         return (<></>);
     }
@@ -31,7 +31,7 @@ function Months({ due, counter }: { due: Due, counter: React.MutableRefObject<nu
     )
 }
 
-function Days({ due, counter }: { due: Due, counter: React.MutableRefObject<Number> }){
+function Days({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<Number> }){
     if (counter.current>1){
         return (<></>);
     }
@@ -41,7 +41,7 @@ function Days({ due, counter }: { due: Due, counter: React.MutableRefObject<Numb
     )
 }
 
-function Hours({ due, counter }: { due: Due, counter: React.MutableRefObject<Number> }){
+function Hours({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<Number> }){
     if (counter.current>1){
         return (<></>);
     }
@@ -51,7 +51,7 @@ function Hours({ due, counter }: { due: Due, counter: React.MutableRefObject<Num
     )
 }
 
-function Minutes({ due, counter }: { due: Due, counter: React.MutableRefObject<Number> }){
+function Minutes({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<Number> }){
     if (counter.current>1){
         return (<></>);
     }
@@ -61,7 +61,7 @@ function Minutes({ due, counter }: { due: Due, counter: React.MutableRefObject<N
     )
 }
 
-function Seconds({ due, counter }: { due: Due, counter: React.MutableRefObject<Number> }){
+function Seconds({ due, counter }: { due: ModelDue, counter: React.MutableRefObject<Number> }){
     if (counter.current>1){
         return (<></>);
     }
@@ -71,7 +71,7 @@ function Seconds({ due, counter }: { due: Due, counter: React.MutableRefObject<N
     )
 }
 
-export default function HeadingDue({ task, editMode }: HeadingDueProps) {
+export function Due({ task, editMode }: HeadingDueProps) {
     if (editMode) { 
         return (
             <div className='
@@ -80,12 +80,12 @@ export default function HeadingDue({ task, editMode }: HeadingDueProps) {
                 grid items-center
             '>
                 <b className='hidden lg:inline'>Completed by: </b> 
-                <Calendar task={ task }/>
+                <Schedule task={ task }/>
             </div>
         )
     }
 
-    let due: Due = task.current.getDue();
+    let due: ModelDue = task.current.getDue();
     let counter: React.MutableRefObject<number> = useRef(0);
 
     let components = [
@@ -128,3 +128,5 @@ export default function HeadingDue({ task, editMode }: HeadingDueProps) {
         </span>
     );
 }
+
+export default Due;

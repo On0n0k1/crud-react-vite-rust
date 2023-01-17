@@ -1,25 +1,4 @@
-import moment from 'moment';
-
-export class Due{
-    years: number;
-    months: number;
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-
-    constructor(due: Date){
-        const elapsed = moment.duration(due.getTime() - Date.now())
-
-        this.years = elapsed.years();
-        this.months = elapsed.months();
-        this.days = elapsed.days();
-        this.hours = elapsed.hours();
-        this.minutes = elapsed.minutes();
-        this.seconds = elapsed.seconds();
-    }
-}
-
+import Due from './Due';
 
 export class Task {
     name: string;
@@ -27,6 +6,7 @@ export class Task {
     due: Date;
     description: string;
     id: number;
+    index: number;
     updated: boolean;
 
     constructor(
@@ -35,6 +15,7 @@ export class Task {
         due: Date,
         description: string,
         id: number,
+        index: number,
     ) {
         this.name = name;
         this.priority = priority;
@@ -42,6 +23,7 @@ export class Task {
         this.description = description;
         this.id = id;
         this.updated = false;
+        this.index = index;
     }
 
     getDue(): Due {
@@ -49,3 +31,4 @@ export class Task {
     }
 }
 
+export default Task;

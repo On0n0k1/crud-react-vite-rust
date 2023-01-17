@@ -1,4 +1,4 @@
-import { Task as ModelTask } from '../../../model/task'
+import { Task as ModelTask } from '../../../../model/model'
 
 import { useEffect, useState } from 'react';
 

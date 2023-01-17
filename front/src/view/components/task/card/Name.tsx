@@ -1,15 +1,13 @@
-import { Due, Task as ModelTask } from '../../../model/task';
+import { Task as ModelTask } from '../../../../model/model';
 
 import { useState, useEffect } from 'react';
 
-
-export interface HeadingNameProps{
+export interface NameProps{
     task: React.MutableRefObject<ModelTask>
     editMode: boolean,
 }
 
-
-export default function HeadingName({ task, editMode }: HeadingNameProps) {
+export function Name({ task, editMode }: NameProps) {
     const [name, setName] = useState(task.current.name);
     
     useEffect(()=>{
@@ -41,3 +39,5 @@ export default function HeadingName({ task, editMode }: HeadingNameProps) {
         "{task.current.name}"
     </span>)
 }
+
+export default Name;
