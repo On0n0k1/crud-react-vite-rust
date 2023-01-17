@@ -9,10 +9,21 @@ interface CalendarTimeHourProps {
 }
 
 export function Hours({ task, isAm }: CalendarTimeHourProps){
-    const [hour, setHour] = useState(task.current.due.getHours() - (isAm ? 0 : 12));
+    const [hour, setHour] = useState(() => {
+        let hours = task.current.due.getHours();
+        if (!isAm) {
+            return hours - 12;
+        }
+
+        return hours;
+    });
 
     useEffect(()=>{
-        task.current.due.setHours(hour + (isAm ? 0 : 12));
+        let hours = hour + (isAm ? 0 : 12);
+        console.log(`isAm ${isAm}`);
+        console.log(`Setting hours as ${hours}`);
+        
+        task.current.due.setHours(hours);
     },[hour]);
 
 
@@ -32,7 +43,7 @@ export function Hours({ task, isAm }: CalendarTimeHourProps){
             <option value={9}>9h</option>
             <option value={10}>10h</option>
             <option value={11}>11h</option>
-            <option value={12}>12h</option>
+            <option value={0}>12h</option>
         </select>
     );
 }

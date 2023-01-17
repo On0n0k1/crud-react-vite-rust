@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import Task  from '../task/Task'
 import { Task as ModelTask } from '../../../model/model'
 
+// Button that creates a new task
 function Include() {
     const action = () => console.log("+ clicked");
 

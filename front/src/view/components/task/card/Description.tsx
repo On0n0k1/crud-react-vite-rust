@@ -77,3 +77,5 @@ export function Description({ task, editMode }: DescriptionProps) {
         </div>        
     );
 }
+
+export default Description;

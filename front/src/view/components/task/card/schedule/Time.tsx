@@ -14,6 +14,23 @@ export function Time({task}: TimeProps) {
     // false: PM true: AM
     const [isAm, setIsAm] = useState(task.current.due.getHours() < 12);
 
+    useEffect(() => {
+        let afternoon = Number(!isAm) * +12;
+
+        let hours = task.current.due.getHours();
+        console.log(`hours: ${hours}, afternoon: ${afternoon}`);
+
+        if ((hours >= 12) && (isAm)) {
+            console.log(`setting `, hours - 12);
+            task.current.due.setHours(hours - 12);
+        } else {
+            if ((hours < 12) && !isAm) {
+                console.log(`setting `, hours + 12);
+                task.current.due.setHours(hours + 12);
+            }
+        }
+    }, [isAm])
+
     return (
             <span className='
                 w-auto h-auto
