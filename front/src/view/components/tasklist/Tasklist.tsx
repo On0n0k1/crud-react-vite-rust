@@ -7,6 +7,23 @@ import { Task as ModelTask } from '../../../model/model'
 function Include() {
     const action = () => console.log("+ clicked");
 
+    fetch('/api/data', {
+        method: 'POST',             // or 'PUT'
+        body: JSON.stringify({ data: "testing"}), // data can be 'string' or {object}!
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }
+    }).then(response => response.json())
+    .then(data => {
+        console.log("Successfully acquired data");
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.log("Failed to acquire data");
+        console.error('Error:', error);
+    });
+
     return (
         <div className='
             py-20 w-full
@@ -34,7 +51,7 @@ export default function TaskList() {
             0,
         ),
         new ModelTask(
-            "name",
+            "nameee",
             1,
             new Date('feb 18 2023'),
             "A description",

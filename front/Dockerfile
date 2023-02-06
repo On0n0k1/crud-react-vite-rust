@@ -1,14 +1,38 @@
-FROM node:latest
+# dep will cache dependencies and only update when package.json changes
+FROM node:14 as dep
+
+# Create a working directory and copy the source code into it
+WORKDIR /app
+
+COPY ./front/package.json .
+
+# Install dependencies
+RUN npm install
+
+FROM node:14 as builder
 
 WORKDIR /app
 
-RUN pwd
-COPY ./front/package.json .
-
-RUN npm i
-
+COPY --from=dep ./app/node_modules ./node_modules
 COPY ./front .
+
+# Build the application
+RUN npm run build
+
+RUN ls -a /app/dist/
+
+# Use nginx as the base image
+FROM nginx
+
+# Copy nginx config file
+COPY /front/nginx.conf /etc/nginx/nginx.conf
+
+# Copy the built files from the previous image
+COPY --from=builder /app/dist/ /app
+
+RUN ls -a /app
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

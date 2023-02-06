@@ -7,7 +7,6 @@ interface ChildProps {
 }
 
 export function Task({ handleRemove, task }: ChildProps) {
-
     return (
         <div className='
             flex justify-center items-center p-2
