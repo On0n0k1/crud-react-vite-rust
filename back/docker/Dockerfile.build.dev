@@ -1,0 +1,5 @@
+FROM crud-react-vite-rust_backend-dep-build-dev as builder
+
+COPY ./back/src/main.rs ./src/main.rs
+
+RUN cargo build --release

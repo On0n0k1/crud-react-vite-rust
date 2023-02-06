@@ -1,0 +1,14 @@
+FROM rust:alpine
+
+RUN apk add --no-cache musl-dev
+WORKDIR /opt
+
+RUN cargo new --bin back
+
+WORKDIR /opt/back
+
+COPY ./back/Cargo.toml ./Cargo.toml
+
+RUN cargo build --release
+
+RUN rm ./target/release/deps/back*

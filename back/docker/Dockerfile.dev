@@ -1,0 +1,11 @@
+FROM crud-react-vite-rust_backend-build-dev as builder
+
+FROM scratch
+
+WORKDIR /opt/back
+
+COPY --from=builder /opt/back/target/release/back .
+
+EXPOSE 3030
+
+CMD ["/opt/back/back"]

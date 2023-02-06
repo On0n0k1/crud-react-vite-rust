@@ -1,0 +1,44 @@
+# FROM rust:latest
+
+# RUN apt-get update && apt-get install -y libpq-dev
+
+# RUN mkdir /app
+# WORKDIR /app
+
+# COPY ./back .
+
+# RUN cargo build --release
+
+# EXPOSE 3030
+
+# CMD ["./target/release/back"]
+
+FROM rust:alpine as builder
+
+RUN apk add --no-cache musl-dev
+WORKDIR /opt
+
+RUN cargo new --bin back
+
+WORKDIR /opt/back
+
+COPY ./back/Cargo.toml ./Cargo.toml
+
+RUN cargo build --release
+
+# RUN rm ./Cargo.lock
+
+RUN rm ./target/release/deps/back*
+
+COPY ./back/src/main.rs ./src/main.rs
+
+RUN cargo build --release
+
+FROM rust:alpine
+WORKDIR /opt/back
+
+COPY --from=builder /opt/back/target/release/back .
+
+EXPOSE 3030
+
+CMD ["/opt/back/back"]
