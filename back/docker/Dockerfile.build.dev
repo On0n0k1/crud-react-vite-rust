@@ -1,6 +1,6 @@
 FROM crud-react-vite-rust_backend0 as builder
 
-COPY ./back/src/main.rs ./src/main.rs
 COPY ./back/src/ ./src/
+
 
 RUN cargo build --release

@@ -5,6 +5,7 @@ FROM scratch
 WORKDIR /opt/back
 
 COPY --from=builder /opt/back/target/release/back .
+COPY ./back/.env .
 
 EXPOSE 3030
 
