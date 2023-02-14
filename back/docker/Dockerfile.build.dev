@@ -1,4 +1,4 @@
-FROM crud-react-vite-rust_backend-dep-build-dev as builder
+FROM crud-react-vite-rust_backend0 as builder
 
 COPY ./back/src/main.rs ./src/main.rs
 COPY ./back/src/ ./src/

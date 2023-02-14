@@ -1,16 +1,16 @@
 version: "3.8"
 services:
-  backend-dep-build-dev:
+  backend0:
     build:
       context: .
       dockerfile: back/docker/Dockerfile.dep.dev
-  backend-build-dev:
+  backend1:
     build: 
       context: .
       dockerfile: back/docker/Dockerfile.build.dev
     depends_on:
-      - backend-dep-build-dev
-  backend:
+      - backend0
+  backend2:
     build:
       context: .
       dockerfile: back/docker/Dockerfile.dev
@@ -21,8 +21,8 @@ services:
     networks:
       - my-network
     depends_on:
-      - backend-dep-build-dev
-      - backend-build-dev
+      - backend0
+      - backend1
   frontend:
     build:
       context: .
@@ -30,13 +30,13 @@ services:
     ports:
       - "5173:80"
     depends_on:
-      - backend
+      - backend2
     networks:
       - my-network
   proxy:
     image: nginx:latest
     depends_on:
-      - backend
+      - backend2
       - frontend
     ports:
       - "80:80"

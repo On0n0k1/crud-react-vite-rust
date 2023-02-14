@@ -1,4 +1,4 @@
-FROM crud-react-vite-rust_backend-build-dev as builder
+FROM crud-react-vite-rust_backend1 as builder
 
 FROM scratch
 
