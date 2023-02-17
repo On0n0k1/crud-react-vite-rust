@@ -23,6 +23,7 @@ services:
     depends_on:
       - backend0
       - backend1
+      - mongodb
   frontend:
     build:
       context: .
@@ -31,6 +32,7 @@ services:
       - "5173:80"
     depends_on:
       - backend2
+      - mongodb
     networks:
       - my-network
   proxy:
@@ -38,11 +40,23 @@ services:
     depends_on:
       - backend2
       - frontend
+      - mongodb
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     command: ["nginx", "-g", "daemon off;"]
+    networks:
+      - my-network
+  mongodb:
+    build:
+      context: .
+      dockerfile: ./db/Dockerfile.mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    command: mongod --config /etc/mongod.conf
     networks:
       - my-network
 networks:
@@ -52,13 +66,3 @@ networks:
       config:
         - subnet: 172.28.0.0/16
           gateway:  172.28.0.1
-
-
-  # db:
-  #   image: postgres
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=password
-  #     - POSTGRES_DB=mydb
-  #   ports:
-  #     - "5432:5432"
