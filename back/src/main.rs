@@ -1,15 +1,13 @@
 #[macro_use]
 extern crate log;
+extern crate mongodb;
 
-
+use mongodb::bson::doc;
 
 mod endpoints;
 mod env;
-mod task;
 mod message;
-// mod read;
-
-use std::sync::Arc;
+mod db;
 
 use endpoints::{
     create::create,
@@ -19,30 +17,25 @@ use endpoints::{
     update::update,
 };
 
-use warp::{Filter, Rejection, Reply};
+use warp::Filter;
 use serde::{Serialize, Deserialize};
-use parking_lot::RwLock;
+use mongodb::bson::oid::{ ObjectId, Result as ParseResult};
 
-use task::Tasks;
 use message::Message;
-
-
+use db::DB;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct JsonData {
     data: String,
 }
 
-
-async fn handle_post(json_data: JsonData) -> Result<impl Reply, Rejection> {
-    info!("Message: {}", json_data.data);
-    Ok(warp::reply::json(&json_data))
-}
-
 fn limit_json() -> impl Filter<Extract = (Message,), Error = warp::Rejection> + Clone {
     warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }
 
+pub fn parse_id(id: &str) -> ParseResult<ObjectId> {
+    ObjectId::parse_str(id)
+}
 
 /// Endpoints
 ///
@@ -70,60 +63,53 @@ fn limit_json() -> impl Filter<Extract = (Message,), Error = warp::Rejection> + 
 async fn main() {
     env::load();
 
-    // let tasks = Arc::new(Mutex::new(Tasks::default()));
-    let tasks = Arc::new(RwLock::new(Tasks::default()));
+    let db = DB::init().await.unwrap();
+    match db.list_databases().await{
+        Err(_) => warn!("Error"),
+        _ => info!("OK"),
+    };
 
-    let tasks_copy = Arc::downgrade(&tasks);
+    let db_filter = warp::any().map(move || db.clone());
 
-    let tasks_filter = warp::any().map(move || tasks_copy.clone());
+    let param_filter = warp::path!("task" / String)
+        .map(|id: String| parse_id(&id).unwrap());
 
     info!("Starting server at localhost");
-    let api_data = warp::path!("api" / "data")
-        .and(warp::post())
-        .and(warp::body::json())
-        .and_then(handle_post);
 
-    // Create
-
-    let create = warp::post()
+    let mongo_insert = warp::post()
         .and(warp::path!("task"))
         .and(limit_json())
-        .and(tasks_filter.clone())
+        .and(db_filter.clone())
         .and_then(create);
+    
+    let mongo_list = warp::get()
+        .and(warp::path!("task"))
+        .and(db_filter.clone())
+        .and_then(list);
 
-    // Read
-
-    let read = warp::get()
-        .and(warp::path!("task" / usize))
-        .and(tasks_filter.clone())
+    let mongo_get = warp::get()
+        .and(param_filter)
+        .and(db_filter.clone())
         .and_then(read);
 
-    // List
-    let list = warp::get()
-        .and(warp::path!("task" / ..))
-        .and(tasks_filter.clone())
-        .and_then(list);
-        
-    // Update
-    let update = warp::put()
-        .and(warp::path!("task" / usize))
+    let mongo_update = warp::put()
+        .and(param_filter)
         .and(limit_json())
-        .and(tasks_filter.clone())
+        .and(db_filter.clone())
         .and_then(update);
 
-    // Delete
-    let delete = warp::delete()
-        .and(warp::path!("task" / usize))
-        .and(tasks_filter.clone())
+    let mongo_delete = warp::delete()
+        .and(param_filter)
+        .and(db_filter)
         .and_then(delete);
 
-    let routes = api_data.or(create).or(read).or(list).or(update).or(delete);
+    let routes =mongo_insert.or(mongo_list).or(mongo_get).or(mongo_delete).or(mongo_update);
 
     let cors = warp::cors()
         .allow_any_origin()
         .allow_methods(vec!["GET", "POST", "PUT","DELETE"]);
 
-    // Apply the CORS middleware to all routes
+    // Apply CORS middleware to all routes
     let routes = routes.with(cors);
 
     warp::serve(routes)

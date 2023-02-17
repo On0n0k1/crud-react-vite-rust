@@ -1,61 +1,54 @@
-use std::sync::Weak;
+use mongodb::error::Result as MongoResult;
 
-use serde::{Deserialize, Serialize};
-use warp::{http::StatusCode, reply::Response, Rejection, Reply};
-use parking_lot::RwLock;
+use serde::{Serialize, Deserialize};
+use warp::{http::StatusCode, Reply};
 
 use crate::{
-    task::{Task, Tasks},
+    db::DB,
     message::Message,
 };
 
-
-pub enum CreateResult{
-    Success(Task),
-}
-
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-enum Output{
-    Success(Task),
+pub enum ServerError{
+    Error(String)
 }
 
-
-#[cfg_attr(feature = "cargo-clippy", allow(clippy::from_over_into))]
-impl Into<Result<Response, Rejection>> for CreateResult {
-    fn into(self) -> Result<Response, Rejection> {
-        // let output = Output::Created;
-        let output = match &self{
-            CreateResult::Success(task) => Output::Success(task.clone())
-        };
-
-        let mut response = warp::reply::json(&output).into_response();
-        let status: &mut StatusCode = response.status_mut();
-
-        *status = match output {
-            Output::Success(_) => StatusCode::CREATED,
-        };
-
-        Ok(response)
+impl Default for ServerError{
+    fn default() -> Self {
+        Self::Error("Server Error".into())
     }
 }
 
-
 pub async fn create(
-    message: Message, 
-    tasks: Weak<RwLock<Tasks>>,
+    message: Message,
+    db: DB,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    info!("Create requested");
+    info!("Mongodb Create requested");
 
-    tasks.upgrade()
-        .unwrap()
-        .write()
-        .create(message)
-        .into()
-    
-    
+    let response = match db.insert(message).await{
+        MongoResult::Err(err) => {
+            warn!("{:#?}", err);
+            let mut response = warp::reply::json(&ServerError::default()).into_response();
 
-    // let response: CreateResult = CreateResult::Success;
+            let status: &mut StatusCode = response.status_mut();
 
-    // response.into()
+            *status = StatusCode::INTERNAL_SERVER_ERROR;
+
+            // return Ok(warp::reply::with_status("Server Error", StatusCode::INTERNAL_SERVER_ERROR));
+            return Ok(response);
+        },
+        MongoResult::Ok(value) => {
+            info!("Success inserting entry: {:#?}", value);
+            value
+        },
+    };
+
+    let mut response = warp::reply::json(&response).into_response();
+
+    let status: &mut StatusCode = response.status_mut();
+
+    *status = StatusCode::OK;
+
+    Ok(response)
 }

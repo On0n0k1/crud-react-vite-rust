@@ -1,61 +1,46 @@
-use std::sync::Weak;
+use mongodb::bson::{ doc, oid::ObjectId };
 
+use warp::{http::StatusCode, reply::Response, Rejection, Reply};
 
 use serde::{Deserialize, Serialize};
-use warp::{http::StatusCode, reply::Response, Rejection, Reply};
-use parking_lot::RwLock;
-
 use crate::{
-    task::{
-        Task,
-        Tasks,
-    },
+    db::{DB, Response as DeleteResponse},
 };
 
-
-pub enum DeleteResult{
-    Success(Task),
-    NotFound,
-}
-
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-enum Output{
-    Found(Task),
+pub enum Output{
+    Found(DeleteResponse),
     NotFound,
 }
-
 
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::from_over_into))]
-impl Into<Result<Response, Rejection>> for DeleteResult {
-    fn into(self) -> Result<Response, Rejection> {        
-        let output: Output = match &self{
-            DeleteResult::NotFound => Output::NotFound,
-            DeleteResult::Success(task) => Output::Found(task.clone()),
-        };
-
-        let mut response = warp::reply::json(&output).into_response();
+impl Into<Result<Response, Rejection>> for Output {
+    fn into(self) -> Result<Response, Rejection> {
+        let mut response = warp::reply::json(&self).into_response();
         let status: &mut StatusCode = response.status_mut();
 
-        *status = match output {
-            Output::Found(_) => StatusCode::FOUND,
-            Output::NotFound => StatusCode::NOT_FOUND,
+        *status = match &self{
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Found(_) => StatusCode::OK,
         };
 
         Ok(response)
     }
 }
 
-
 pub async fn delete(
-    id: usize, 
-    tasks: Weak<RwLock<Tasks>>,
+    id: ObjectId,
+    db: DB,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    info!("Delete requested");
+    info!("Mongodb Delete Requested");
 
-    tasks.upgrade()
-        .unwrap()
-        .write()
-        .delete(id)
-        .into()
+    let response: Option<DeleteResponse> = db.delete(id).await.unwrap();
+
+    let output: Output = match response{
+        None => Output::NotFound,
+        Some(value) => Output::Found(value),
+    };
+
+    output.into()
 }

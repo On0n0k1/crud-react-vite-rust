@@ -1,47 +1,32 @@
-use std::sync::Weak;
+use mongodb::bson::{ doc, oid::ObjectId };
+
+use warp::{http::StatusCode, reply::Response, Rejection, Reply};
+
 
 use serde::{Deserialize, Serialize};
-use warp::{http::StatusCode, reply::Response, Rejection, Reply};
-use parking_lot::RwLock;
-
 use crate::{
-    task::{
-        Task,
-        Tasks,
-    },
+    db::{DB, Response as UpdateResponse},
     message::Message,
 };
 
 
-pub enum UpdateResult{
-    Success(Task),
-    NotFound
-}
-
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-enum Output{
-    Success(Task),
-    NotFound
+pub enum Output{
+    Found(UpdateResponse),
+    NotFound,
 }
 
 
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::from_over_into))]
-impl Into<Result<Response, Rejection>> for UpdateResult {
+impl Into<Result<Response, Rejection>> for Output {
     fn into(self) -> Result<Response, Rejection> {
-        let output: Output = match &self {
-            UpdateResult::Success(task) => Output::Success(task.clone()),
-            UpdateResult::NotFound => Output::NotFound,
-        };
-        // let output = Output::UPDATED();
-
-
-        let mut response = warp::reply::json(&output).into_response();
+        let mut response = warp::reply::json(&self).into_response();
         let status: &mut StatusCode = response.status_mut();
 
-        *status = match output {
-            Output::Success(_) => StatusCode::OK,
-            Output::NotFound => StatusCode::NOT_FOUND,
+        *status = match &self{
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Found(_) => StatusCode::OK,
         };
 
         Ok(response)
@@ -50,19 +35,18 @@ impl Into<Result<Response, Rejection>> for UpdateResult {
 
 
 pub async fn update(
-    id: usize,
-    message: Message, 
-    tasks: Weak<RwLock<Tasks>>,
+    id: ObjectId,
+    update: Message,
+    db: DB,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    info!("Update requested");
+    info!("Mongodb Update Requested");
 
-    // let response: UpdateResult = UpdateResult::Success;
+    let response: Option<UpdateResponse> = db.update(id, update).await.unwrap();
 
-    // response.into()
+    let output: Output = match response{
+        None => Output::NotFound,
+        Some(value) => Output::Found(value),
+    };
 
-    tasks.upgrade()
-        .unwrap()
-        .write()
-        .update(id, message)
-        .into()
+    output.into()
 }

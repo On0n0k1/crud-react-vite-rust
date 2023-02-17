@@ -1,65 +1,41 @@
-use std::sync::Weak;
+use mongodb::bson::doc;
+
+use warp::{http::StatusCode, reply::Response, Rejection, Reply};
 
 use serde::{Deserialize, Serialize};
-use warp::{http::StatusCode, reply::Response, Rejection, Reply};
-use parking_lot::RwLock;
-
 use crate::{
-    task::{
-        Task,
-        Tasks,
+    db::{
+        DB,
+        Response as DBResponse,
     },
 };
 
-
-pub enum ListResult{
-    Success(Vec<Task>),
-}
-
-
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-enum Output{
-    Success(Vec<Task>),
-    // NOTFOUND,
+pub enum GetResponse{
+    Messages(Vec<DBResponse>),
 }
 
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::from_over_into))]
-impl Into<Result<Response, Rejection>> for ListResult {
+impl Into<Result<Response, Rejection>> for GetResponse {
     fn into(self) -> Result<Response, Rejection> {
-        // let output: Output = match self {
-        //     SUCCESS => Output::SUCCESS,
-        // };
-        // let output = Output::SUCCESS;
-        let output = match &self{
-            Self::Success(values) => Output::Success(values.clone()),
-        };
-
-        let mut response = warp::reply::json(&output).into_response();
+        let mut response = warp::reply::json(&self).into_response();
         let status: &mut StatusCode = response.status_mut();
 
-        *status = match output {
-            Output::Success(_) => StatusCode::OK,
-            // Output::NOTFOUND => StatusCode::NOT_FOUND,
-        };
+        *status = StatusCode::OK;
 
         Ok(response)
     }
 }
 
-
 pub async fn list(
-    tasks: Weak<RwLock<Tasks>>,
+    db: DB,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    info!("List requested");
+    info!("Mongodb Get Requested");
 
-    // let response: ReadResult = ReadResult::SUCCESS;
+    let response: Vec<DBResponse> = db.list().await.unwrap();
 
-    // response.into()
+    let output = GetResponse::Messages(response);
 
-    tasks.upgrade()
-        .unwrap()
-        .read()
-        .list()
-        .into()
+    output.into()
 }

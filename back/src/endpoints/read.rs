@@ -1,68 +1,47 @@
-use std::sync::Weak;
+use mongodb::bson::{ doc, oid::ObjectId };
+
+use warp::{http::StatusCode, reply::Response, Rejection, Reply};
+
 
 use serde::{Deserialize, Serialize};
-use warp::{http::StatusCode, reply::Response, Rejection, Reply};
-use parking_lot::RwLock;
-
 use crate::{
-    task::{
-        Task,
-        Tasks,
-    },
+    db::{DB, Response as GetResponse},
 };
 
-
-pub enum ReadResult{
-    Success(Task),
-    NotFound,
-}
-
-
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-enum Output{
-    Found(Task),
+pub enum Output{
+    Found(GetResponse),
     NotFound,
 }
 
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::from_over_into))]
-impl Into<Result<Response, Rejection>> for ReadResult {
+impl Into<Result<Response, Rejection>> for Output {
     fn into(self) -> Result<Response, Rejection> {
-        // let output: Output = match self {
-        //     SUCCESS => Output::FOUND,
-        // };
-        // let output = Output::Found;
-        let output: Output = match &self{
-            ReadResult::NotFound => Output::NotFound,
-            ReadResult::Success(value) => Output::Found(value.clone())
-        };
-
-        let mut response = warp::reply::json(&output).into_response();
+        let mut response = warp::reply::json(&self).into_response();
         let status: &mut StatusCode = response.status_mut();
 
-        *status = match output {
-            Output::Found(_) => StatusCode::FOUND,
-            Output::NotFound => StatusCode::NOT_FOUND,
+        *status = match &self{
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Found(_) => StatusCode::OK,
         };
 
         Ok(response)
     }
 }
 
-
 pub async fn read(
-    id: usize, 
-    tasks: Weak<RwLock<Tasks>>,
+    id: ObjectId,
+    db: DB,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    info!("Read requested");
+    info!("Mongodb Get Requested");
 
-    // let response: ReadResult = ReadResult::SUCCESS;
+    let response: Option<GetResponse> = db.get(id).await.unwrap();
 
-    // response.into()
+    let output: Output = match response{
+        None => Output::NotFound,
+        Some(value) => Output::Found(value),
+    };
 
-    tasks.upgrade()
-        .unwrap()
-        .read()
-        .read(id)
-        .into()
+    output.into()
 }
