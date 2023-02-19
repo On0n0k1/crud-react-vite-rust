@@ -41,11 +41,21 @@ pub async fn update(
 ) -> Result<impl warp::Reply, warp::Rejection> {
     info!("Mongodb Update Requested");
 
-    let response: Option<UpdateResponse> = db.update(id, update).await.unwrap();
+    let response: Option<UpdateResponse> = db.update(id, update.clone()).await.unwrap();
 
     let output: Output = match response{
         None => Output::NotFound,
-        Some(value) => Output::Found(value),
+        Some(mut found) => {
+            let (name, priority, due, description) = update.unwrap();
+            // The attributes of the returned element are the old ones.
+            // Changing the values so the new object is displayed properly.
+            found.name = name;
+            found.priority = priority;
+            found.due = due;
+            found.description = description;
+
+            Output::Found(found)
+        },
     };
 
     output.into()
