@@ -1,6 +1,13 @@
 FROM crud-react-vite-rust_backend0 as builder
 
-COPY ./back/src/ ./src/
+FROM rust:alpine
 
+RUN apk add --no-cache musl-dev
+WORKDIR /opt/back
+
+COPY --from=builder /opt/back/target ./target
+COPY --from=builder /opt/back/Cargo.toml ./Cargo.toml
+COPY --from=builder /opt/back/Cargo.lock ./Cargo.lock
+COPY ./back/src/ ./src/
 
 RUN cargo build --release

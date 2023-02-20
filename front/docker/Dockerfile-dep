@@ -1,0 +1,10 @@
+# dep will cache dependencies and only update when package.json changes
+FROM node:14
+
+# Create a working directory and copy the source code into it
+WORKDIR /app
+
+COPY ./front/package.json .
+
+# Install dependencies
+RUN npm install

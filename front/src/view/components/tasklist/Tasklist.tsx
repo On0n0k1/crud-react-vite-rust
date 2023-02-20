@@ -3,27 +3,72 @@ import { useRef } from 'react'
 import Task  from '../task/Task'
 import { Task as ModelTask } from '../../../model/model'
 
-// Button that creates a new task
-function Include() {
-    const action = () => console.log("+ clicked");
+function fetchTasks() {
+    
+    // fetch('/api/data', {
+    //     method: 'POST',             
+    //     body: JSON.stringify({ data: "testing"}), // data can be 'string' or {object}!
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Access-Control-Allow-Origin': '*'
+    //     }
+    // }).then(response => response.json())
+    // .then(data => {
+    //     console.log("Successfully acquired data");
+    //     console.log('Success:', data);
+    // })
+    // .catch((error) => {
+    //     console.log("Failed to acquire data");
+    //     console.error('Error:', error);
+    // });
 
-    fetch('/api/data', {
-        method: 'POST',             // or 'PUT'
-        body: JSON.stringify({ data: "testing"}), // data can be 'string' or {object}!
+    // Todo: Change ACAO to only allow origins from the backend
+    fetch('/task/', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         }
     }).then(response => response.json())
-    .then(data => {
-        console.log("Successfully acquired data");
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.log("Failed to acquire data");
-        console.error('Error:', error);
-    });
+        .then(data => {
+            console.log("Successfully acquired tasks");
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.log("Failed to acquire tasks")
+            console.error('Error:', error);
+        })
+}
 
+
+// Button that creates a new task
+// Todo: Update this
+function Include() {
+    const action = () => console.log("+ clicked");
+
+    // Below: To be removed
+    // fetch('/api/data', {
+    //     method: 'POST',             // or 'PUT'
+    //     body: JSON.stringify({ data: "testing"}), // data can be 'string' or {object}!
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Access-Control-Allow-Origin': '*'
+    //     }
+    // }).then(response => response.json())
+    // .then(data => {
+    //     console.log("Successfully acquired data");
+    //     console.log('Success:', data);
+    // })
+    // .catch((error) => {
+    //     console.log("Failed to acquire data");
+    //     console.error('Error:', error);
+    // });
+
+    // Above: to be removed
+
+    fetchTasks()
+
+    
     return (
         <div className='
             py-20 w-full

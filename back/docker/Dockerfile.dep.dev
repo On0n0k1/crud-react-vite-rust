@@ -11,4 +11,6 @@ COPY ./back/Cargo.toml ./Cargo.toml
 
 RUN cargo build --release
 
+# Without removing the final compiled executable, 
+# Cargo will not rebuild it with the new source files
 RUN rm ./target/release/deps/back*

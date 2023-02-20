@@ -30,8 +30,6 @@ COPY /front/nginx.conf /etc/nginx/nginx.conf
 # Copy the built files from the previous image
 COPY --from=builder /app/dist/ /app
 
-RUN ls -a /app
-
 EXPOSE 5173
 
 # Start nginx

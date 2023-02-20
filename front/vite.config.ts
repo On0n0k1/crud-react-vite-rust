@@ -44,8 +44,8 @@ export default defineConfig({
     
     server: {
         proxy: {
-            "/api/": {
-                target: "https://proxy:80/api/",
+            "/task/": {
+                target: "https://proxy:80/task/",
                 changeOrigin: true,
                 secure: false,
                 // rewrite: (path) => path.replace(/^\/api/, ""),

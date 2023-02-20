@@ -24,22 +24,34 @@ services:
       - backend0
       - backend1
       - mongodb
-  frontend:
+
+  frontend0:
     build:
       context: .
-      dockerfile: front/Dockerfile
+      dockerfile: front/docker/Dockerfile-dep
+  frontend1:
+    build:
+      context: .
+      dockerfile: front/docker/Dockerfile-build
+    depends_on:
+      - frontend0
+  frontend2:
+    build:
+      context: .
+      dockerfile: front/docker/Dockerfile
     ports:
-      - "5173:80"
+      - "5173:5173"
     depends_on:
       - backend2
       - mongodb
+      - frontend1
     networks:
       - my-network
   proxy:
     image: nginx:latest
     depends_on:
       - backend2
-      - frontend
+      - frontend2
       - mongodb
     ports:
       - "80:80"

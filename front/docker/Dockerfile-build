@@ -1,0 +1,13 @@
+FROM crud-react-vite-rust_frontend0 as dep
+
+FROM node:14 as builder
+
+WORKDIR /app
+
+COPY --from=dep ./app/node_modules ./node_modules
+COPY ./front .
+
+# Build the application
+RUN npm run build
+
+RUN ls -a /app/dist/
