@@ -1,32 +1,26 @@
 use mongodb::error::Result as MongoResult;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use warp::{http::StatusCode, Reply};
 
-use crate::{
-    db::DB,
-    message::Message,
-};
+use crate::{db::DB, message::Message};
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum ServerError{
-    Error(String)
+pub enum ServerError {
+    Error(String),
 }
 
-impl Default for ServerError{
+impl Default for ServerError {
     fn default() -> Self {
         Self::Error("Server Error".into())
     }
 }
 
-pub async fn create(
-    message: Message,
-    db: DB,
-) -> Result<impl warp::Reply, warp::Rejection> {
+pub async fn create(message: Message, db: DB) -> Result<impl warp::Reply, warp::Rejection> {
     info!("Mongodb Create requested");
 
-    let response = match db.insert(message).await{
+    let response = match db.insert(message).await {
         MongoResult::Err(err) => {
             warn!("{:#?}", err);
             let mut response = warp::reply::json(&ServerError::default()).into_response();
@@ -37,11 +31,11 @@ pub async fn create(
 
             // return Ok(warp::reply::with_status("Server Error", StatusCode::INTERNAL_SERVER_ERROR));
             return Ok(response);
-        },
+        }
         MongoResult::Ok(value) => {
             info!("Success inserting entry: {:#?}", value);
             value
-        },
+        }
     };
 
     let mut response = warp::reply::json(&response).into_response();

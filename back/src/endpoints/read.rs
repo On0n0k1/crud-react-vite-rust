@@ -1,16 +1,13 @@
-use mongodb::bson::{ doc, oid::ObjectId };
+use mongodb::bson::{doc, oid::ObjectId};
 
 use warp::{http::StatusCode, reply::Response, Rejection, Reply};
 
-
+use crate::db::{Response as GetResponse, DB};
 use serde::{Deserialize, Serialize};
-use crate::{
-    db::{DB, Response as GetResponse},
-};
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum Output{
+pub enum Output {
     Found(GetResponse),
     NotFound,
 }
@@ -21,7 +18,7 @@ impl Into<Result<Response, Rejection>> for Output {
         let mut response = warp::reply::json(&self).into_response();
         let status: &mut StatusCode = response.status_mut();
 
-        *status = match &self{
+        *status = match &self {
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::Found(_) => StatusCode::OK,
         };
@@ -30,15 +27,12 @@ impl Into<Result<Response, Rejection>> for Output {
     }
 }
 
-pub async fn read(
-    id: ObjectId,
-    db: DB,
-) -> Result<impl warp::Reply, warp::Rejection> {
+pub async fn read(id: ObjectId, db: DB) -> Result<impl warp::Reply, warp::Rejection> {
     info!("Mongodb Get Requested");
 
     let response: Option<GetResponse> = db.get(id).await.unwrap();
 
-    let output: Output = match response{
+    let output: Output = match response {
         None => Output::NotFound,
         Some(value) => Output::Found(value),
     };

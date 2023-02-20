@@ -2,17 +2,12 @@ use mongodb::bson::doc;
 
 use warp::{http::StatusCode, reply::Response, Rejection, Reply};
 
+use crate::db::{Response as DBResponse, DB};
 use serde::{Deserialize, Serialize};
-use crate::{
-    db::{
-        DB,
-        Response as DBResponse,
-    },
-};
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum GetResponse{
+pub enum GetResponse {
     Messages(Vec<DBResponse>),
 }
 
@@ -28,9 +23,7 @@ impl Into<Result<Response, Rejection>> for GetResponse {
     }
 }
 
-pub async fn list(
-    db: DB,
-) -> Result<impl warp::Reply, warp::Rejection> {
+pub async fn list(db: DB) -> Result<impl warp::Reply, warp::Rejection> {
     info!("Mongodb Get Requested");
 
     let response: Vec<DBResponse> = db.list().await.unwrap();
